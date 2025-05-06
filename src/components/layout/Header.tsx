@@ -9,44 +9,42 @@ const Header = () => {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+          <Link to="/" className="flex items-center gap-2 text-2xl font-bold">
             <Car className="w-8 h-8 text-blue-600" />
-            CubaTaxi
+            <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+              CubaTaxi
+            </span>
           </Link>
 
           {/* Menú móvil */}
           <button 
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Menú"
           >
             <Menu className="w-6 h-6 text-gray-600" />
           </button>
 
           {/* Navegación desktop */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             <Link 
               to="/" 
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
-              Inicio
-            </Link>
-            <Link 
-              to="/conductores" 
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-            >
               Conductores
             </Link>
+            <div className="h-6 w-px bg-gray-200"></div>
             <Link 
-              to="/clientes" 
+              to="/login" 
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
-              Clientes
+              Iniciar Sesión
             </Link>
             <Link 
-              to="/conductores/registro"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+              to="/register"
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
             >
-              Registrarse
+              Registrarse como Conductor
             </Link>
           </div>
         </div>
@@ -60,28 +58,21 @@ const Header = () => {
                 className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Inicio
-              </Link>
-              <Link 
-                to="/conductores" 
-                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
                 Conductores
               </Link>
               <Link 
-                to="/clientes" 
+                to="/login" 
                 className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Clientes
+                Iniciar Sesión
               </Link>
               <Link 
-                to="/conductores/registro"
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-center"
+                to="/register"
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-center shadow-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Registrarse
+                Registrarse como Conductor
               </Link>
             </div>
           </div>

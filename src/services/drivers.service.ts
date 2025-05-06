@@ -1,12 +1,24 @@
-import type { Drivers } from '../types/drivers';
-import api from './axios.config';
+import axios from 'axios';
+import type { Drivers, DriverDetails } from '../types/drivers';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const getDrivers = async (): Promise<Drivers[]> => {
   try {
-    const { data } = await api.get<Drivers[]>('/api/users');
-    return data;
+    const response = await axios.get(`${API_URL}/api/users`);
+    return response.data;
   } catch (error) {
-    console.error('Error en getDrivers:', error);
+    console.error('Error al obtener conductores:', error);
+    throw error;
+  }
+};
+
+export const getDriverDetails = async (userId: number): Promise<DriverDetails> => {
+  try {
+    const response = await axios.get(`${API_URL}/api/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener detalles del conductor:', error);
     throw error;
   }
 };
