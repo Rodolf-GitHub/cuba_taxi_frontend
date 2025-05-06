@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Car, Menu } from 'lucide-react';
+import { Car, Menu, UserCircle, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useAuthStore } from '../../stores/authStore';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -47,6 +49,36 @@ const Header = () => {
               Registrarse como Conductor
             </Link>
           </div>
+
+          {isAuthenticated && (
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/profile" 
+                className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                {user?.profile_picture ? (
+                  <img 
+                    src={user.profile_picture} 
+                    alt="Perfil"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <UserCircle className="w-8 h-8" />
+                )}
+                <span className="ml-2 text-sm font-medium">
+                  {user?.first_name || user?.username}
+                </span>
+              </Link>
+              
+              <button 
+                onClick={logout}
+                className="text-gray-600 hover:text-red-600 transition-colors"
+                title="Cerrar sesión"
+              >
+                <LogOut className="w-6 h-6" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Menú móvil expandido */}

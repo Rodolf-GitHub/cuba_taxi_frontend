@@ -436,8 +436,8 @@ const Register = () => {
                   </span>
                 ) : (
                   <>
-                    <UserPlus className="h-5 w-5 mr-2" />
-                    Registrarme
+                <UserPlus className="h-5 w-5 mr-2" />
+                Registrarme
                   </>
                 )}
               </button>

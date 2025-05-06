@@ -190,7 +190,7 @@ const Home = () => {
             tiposVehiculo={tiposVehiculo}
             isLoading={loading}
           />
-        </div>
+                        </div>
 
         {/* Lista de conductores */}
         <div className="container mx-auto py-4">
@@ -211,4 +211,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home; 
