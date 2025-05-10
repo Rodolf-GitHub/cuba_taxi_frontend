@@ -1,20 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User as UserIcon, Camera, Loader2, MapPin, Car, Phone, Mail, UserCircle } from 'lucide-react';
-import { useAuthStore } from '../stores/authStore';
-import { getProfile, updateProfile, updateProfilePicture, updateVehiclePicture } from '../services/profile.service';
+import { User as UserIcon, Camera, Loader2, MapPin, Car, Phone, UserCircle, Mail, Clock, RefreshCw } from 'lucide-react';
+import axios from 'axios';
 import { getProvincias, getMunicipiosByProvincia } from '../services/locations.service';
 import type { Provincia, Municipio } from '../types/locations';
-import type { User, VehicleType, DisponibilidadType } from '../types/user';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+type VehicleType = 'TAXI' | 'MOTOCICLETA' | 'CAMION' | 'FURGONETA' | 'COCHE' | 'OTRO';
+type DisponibilidadType = 'DISPONIBLE' | 'NO_DISPONIBLE' | 'OCUPADO';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  telefono: string;
+  profile_picture: string | null;
+  foto_vehiculo: string | null;
+  tipo_vehiculo: VehicleType;
+  capacidad_pasajeros: number;
+  disponibilidad: DisponibilidadType;
+  ultima_disponibilidad: string;
+  municipio_id: string;
+  municipio_nombre: string;
+  provincia_id: string;
+  provincia_nombre: string;
+  tiempo_disponibilidad_restante: number | null;
+}
 
 const vehicleTypes: VehicleType[] = ['TAXI', 'MOTOCICLETA', 'CAMION', 'FURGONETA', 'COCHE', 'OTRO'];
 const disponibilidadTypes: DisponibilidadType[] = ['DISPONIBLE', 'NO_DISPONIBLE', 'OCUPADO'];
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [provincias, setProvincias] = useState<Provincia[]>([]);
@@ -27,25 +49,48 @@ const Profile = () => {
     last_name: '',
     email: '',
     telefono: '',
-    tipo_vehiculo: 'TAXI',
+    tipo_vehiculo: vehicleTypes[0],
     capacidad_pasajeros: 4,
-    disponibilidad: 'DISPONIBLE',
+    disponibilidad: disponibilidadTypes[0],
     municipio_id: ''
   });
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [updatingDisponibilidad, setUpdatingDisponibilidad] = useState(false);
+
+  // Función para construir la URL completa de las imágenes
+  const getFullImageUrl = (imageUrl: string | null) => {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${API_URL}${imageUrl}`;
+  };
 
   // Cargar datos del perfil
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       navigate('/login');
       return;
     }
 
     const loadUserProfile = async () => {
-      setLoading(true);
       try {
-        const userData = await getProfile();
+        console.log('Intentando obtener perfil de usuario...');
+        const response = await axios.get(`${API_URL}/api/users/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const userData = response.data;
         console.log('Datos del perfil cargados:', userData);
-        setUser(userData);
+        
+        // Actualizar las URLs de las imágenes con la URL base
+        const userWithFullUrls = {
+          ...userData,
+          profile_picture: getFullImageUrl(userData.profile_picture),
+          foto_vehiculo: getFullImageUrl(userData.foto_vehiculo)
+        };
+        
+        setUser(userWithFullUrls);
         setFormData({
           first_name: userData.first_name,
           last_name: userData.last_name,
@@ -59,14 +104,21 @@ const Profile = () => {
         setSelectedProvincia(userData.provincia_id);
       } catch (error) {
         console.error('Error al cargar el perfil:', error);
+        if (axios.isAxiosError(error)) {
+          console.error('Status:', error.response?.status);
+          console.error('Data:', error.response?.data);
+        }
         setError('Error al cargar el perfil');
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          navigate('/login');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadUserProfile();
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   // Cargar provincias
   useEffect(() => {
@@ -113,6 +165,19 @@ const Profile = () => {
     loadMunicipios();
   }, [selectedProvincia]);
 
+  // Actualizar el tiempo restante cada minuto
+  useEffect(() => {
+    if (user?.tiempo_disponibilidad_restante) {
+      setTimeLeft(user.tiempo_disponibilidad_restante);
+      
+      const timer = setInterval(() => {
+        setTimeLeft(prev => prev !== null ? Math.max(0, prev - 1) : null);
+      }, 60000); // Actualizar cada minuto
+
+      return () => clearInterval(timer);
+    }
+  }, [user?.tiempo_disponibilidad_restante]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -137,17 +202,84 @@ const Profile = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
-      const updatedUserData = await updateProfile(formData);
-      setUser(updatedUserData);
+      const data = {
+        tipo_vehiculo: formData.tipo_vehiculo,
+        capacidad_pasajeros: parseInt(formData.capacidad_pasajeros.toString(), 10),
+        disponibilidad: formData.disponibilidad,
+        telefono: formData.telefono.trim(),
+        municipio_id: formData.municipio_id.trim(),
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        email: formData.email.trim()
+      };
+
+      // Validar que ningún campo esté vacío
+      const emptyFields = Object.entries(data)
+        .filter(([, value]) => value === '' || value === undefined || value === null)
+        .map(([key]) => key);
+
+      if (emptyFields.length > 0) {
+        setError(`Los siguientes campos son requeridos: ${emptyFields.join(', ')}`);
+        setLoading(false);
+        return;
+      }
+
+      // Crear FormData y añadir los datos como string JSON
+      const formDataToSend = new FormData();
+      formDataToSend.append('data', JSON.stringify(data));
+
+      console.log('Datos a enviar:', data);
+
+      const response = await axios.put(`${API_URL}/api/users/me`, formDataToSend, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const updatedUser = {
+        ...response.data,
+        profile_picture: getFullImageUrl(response.data.profile_picture),
+        foto_vehiculo: getFullImageUrl(response.data.foto_vehiculo)
+      };
+      setUser(updatedUser);
       showSuccessMessage('Perfil actualizado correctamente');
-      console.log('Perfil actualizado:', updatedUserData);
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
-      setError('Error al actualizar el perfil');
+      if (axios.isAxiosError(error)) {
+        console.error('Status:', error.response?.status);
+        console.error('Data:', error.response?.data);
+        
+        // Manejar el error de validación del backend
+        if (error.response?.data?.detail && Array.isArray(error.response.data.detail)) {
+          const errorMessages = error.response.data.detail
+            .map((err: { loc?: string[], msg?: string }) => {
+              if (err.loc && err.loc.length > 1) {
+                return `Campo ${err.loc[1]}: ${err.msg}`;
+              }
+              return err.msg;
+            })
+            .join('. ');
+          setError(errorMessages);
+        } else {
+          setError(error.response?.data?.detail || 'Error al actualizar el perfil');
+        }
+      } else {
+        setError('Error al actualizar el perfil');
+      }
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -156,14 +288,36 @@ const Profile = () => {
   const handleProfilePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('profile_picture', e.target.files[0]);
+    
     setLoading(true);
     try {
-      const updatedUserData = await updateProfilePicture(e.target.files[0]);
-      setUser(updatedUserData);
+      const response = await axios.put(`${API_URL}/api/users/me/profile-picture`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      const updatedUser = {
+        ...response.data,
+        profile_picture: getFullImageUrl(response.data.profile_picture),
+        foto_vehiculo: getFullImageUrl(response.data.foto_vehiculo)
+      };
+      setUser(updatedUser);
       showSuccessMessage('Foto de perfil actualizada correctamente');
     } catch (error) {
       console.error('Error al actualizar la foto de perfil:', error);
       setError('Error al actualizar la foto de perfil');
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -172,16 +326,76 @@ const Profile = () => {
   const handleVehiclePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('foto_vehiculo', e.target.files[0]);
+    
     setLoading(true);
     try {
-      const updatedUserData = await updateVehiclePicture(e.target.files[0]);
-      setUser(updatedUserData);
+      const response = await axios.put(`${API_URL}/api/users/me/vehicle-picture`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      const updatedUser = {
+        ...response.data,
+        profile_picture: getFullImageUrl(response.data.profile_picture),
+        foto_vehiculo: getFullImageUrl(response.data.foto_vehiculo)
+      };
+      setUser(updatedUser);
       showSuccessMessage('Foto del vehículo actualizada correctamente');
     } catch (error) {
       console.error('Error al actualizar la foto del vehículo:', error);
       setError('Error al actualizar la foto del vehículo');
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Función para formatear el tiempo restante
+  const formatTimeLeft = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  };
+
+  // Función para actualizar disponibilidad
+  const handleUpdateDisponibilidad = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    setUpdatingDisponibilidad(true);
+    try {
+      // Establecer inmediatamente 12 horas (720 minutos)
+      setTimeLeft(720);
+      showSuccessMessage('Disponibilidad actualizada a 12 horas');
+
+      // Hacer la petición en segundo plano
+      axios.post(
+        `${API_URL}/api/users/set-disponible`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      ).catch(error => {
+        console.error('Error al actualizar disponibilidad:', error);
+      });
+    } finally {
+      setUpdatingDisponibilidad(false);
     }
   };
 
@@ -274,6 +488,17 @@ const Profile = () => {
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Información Personal</h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {/* Username (no editable) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nombre de usuario
+                  </label>
+                  <div className="mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50">
+                    {user?.username}
+                  </div>
+                </div>
+
+                {/* Nombre */}
                 <div>
                   <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
                     Nombre
@@ -294,6 +519,7 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Apellidos */}
                 <div>
                   <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
                     Apellidos
@@ -314,6 +540,7 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Correo electrónico
@@ -334,6 +561,7 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Teléfono */}
                 <div>
                   <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">
                     Teléfono
@@ -408,22 +636,48 @@ const Profile = () => {
                   <label htmlFor="disponibilidad" className="block text-sm font-medium text-gray-700">
                     Disponibilidad
                   </label>
-                  <div className="mt-1 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <UserIcon className="h-5 w-5 text-gray-400" />
+                  <div className="mt-1 space-y-2">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Clock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <select
+                        name="disponibilidad"
+                        id="disponibilidad"
+                        required
+                        className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                        value={formData.disponibilidad}
+                        onChange={handleChange}
+                      >
+                        {disponibilidadTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
                     </div>
-                    <select
-                      name="disponibilidad"
-                      id="disponibilidad"
-                      required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                      value={formData.disponibilidad}
-                      onChange={handleChange}
-                    >
-                      {disponibilidadTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
+                    
+                    {formData.disponibilidad === 'DISPONIBLE' && (
+                      <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
+                        <div className="flex items-center space-x-2 text-blue-700">
+                          <Clock className="h-5 w-5" />
+                          <span className="text-sm font-medium">
+                            {timeLeft !== null ? `Tiempo restante: ${formatTimeLeft(timeLeft)}` : 'No disponible'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleUpdateDisponibilidad}
+                          disabled={updatingDisponibilidad}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                          {updatingDisponibilidad ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4" />
+                          )}
+                          <span className="ml-2">Actualizar</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -28,26 +28,30 @@ const Header = () => {
           </button>
 
           {/* Navegación desktop */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center space-x-4">
             <Link 
               to="/" 
               className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
               Conductores
             </Link>
-            <div className="h-6 w-px bg-gray-200"></div>
-            <Link 
-              to="/login" 
-              className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-            >
-              Iniciar Sesión
-            </Link>
-            <Link 
-              to="/register"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
-            >
-              Registrarse como Conductor
-            </Link>
+            {!isAuthenticated && (
+              <>
+                <div className="h-6 w-px bg-gray-200"></div>
+                <Link 
+                  to="/login" 
+                  className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link 
+                  to="/register"
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
+                >
+                  Registrarse como Conductor
+                </Link>
+              </>
+            )}
           </div>
 
           {isAuthenticated && (
@@ -92,20 +96,24 @@ const Header = () => {
               >
                 Conductores
               </Link>
-              <Link 
-                to="/login" 
-                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Iniciar Sesión
-              </Link>
-              <Link 
-                to="/register"
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-center shadow-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Registrarse como Conductor
-              </Link>
+              {!isAuthenticated && (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Iniciar Sesión
+                  </Link>
+                  <Link 
+                    to="/register"
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-center shadow-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Registrarse como Conductor
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
