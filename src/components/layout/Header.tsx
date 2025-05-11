@@ -70,6 +70,12 @@ const Header = () => {
             >
               Conductores
             </Link>
+            <Link 
+              to="/help" 
+              className="text-gray-600 hover:text-yellow-600 transition-colors font-medium"
+            >
+              Ayuda
+            </Link>
             {!isAuthenticated && (
               <>
                 <div className="h-6 w-px bg-gray-200"></div>
@@ -147,6 +153,14 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Conductores
+              </Link>
+              
+              <Link 
+                to="/help" 
+                className="flex items-center gap-2 px-2 py-2 text-gray-600 hover:text-yellow-600 transition-colors font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Ayuda
               </Link>
               
               {isAuthenticated ? (

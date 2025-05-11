@@ -5,6 +5,7 @@ import DriverDetails from './pages/DriverDetails';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Profile from './pages/Profile';
+import Help from './pages/Help';
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/help" element={<Help />} />
           {/* Aquí se agregarán más rutas cuando se creen las páginas correspondientes */}
         </Routes>
       </MainLayout>
