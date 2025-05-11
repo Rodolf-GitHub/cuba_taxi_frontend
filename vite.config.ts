@@ -23,10 +23,10 @@ export default defineConfig(({ mode }) => {
           'screenshot-mobile.png'
         ],
         manifest: {
-          name: 'Cuba Taxi',
-          short_name: 'CubaTaxi',
-          description: 'Servicio de taxis en Cuba',
-          theme_color: '#2563eb',
+          name: 'RutaDirecta',
+          short_name: 'RutaDirecta',
+          description: 'Servicio de transporte y mensajería',
+          theme_color: '#FFC107',
           background_color: '#ffffff',
           display: 'standalone',
           orientation: 'portrait',

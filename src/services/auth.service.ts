@@ -28,6 +28,11 @@ interface RegisterData {
   municipio_id: string;
 }
 
+interface RegisterResponse {
+  message: string;
+  user_id: number;
+}
+
 export const login = async (data: LoginData): Promise<LoginResponse> => {
   try {
     const response = await axios.post(`${API_URL}/api/auth/login`, data);
@@ -41,9 +46,9 @@ export const login = async (data: LoginData): Promise<LoginResponse> => {
   }
 };
 
-export const register = async (data: RegisterData): Promise<any> => {
+export const register = async (data: RegisterData): Promise<RegisterResponse> => {
   try {
-    const response = await axios.post(`${API_URL}/api/auth/register`, data);
+    const response = await axios.post<RegisterResponse>(`${API_URL}/api/auth/register`, data);
     return response.data;
   } catch (error) {
     console.error('Error en registro:', error);

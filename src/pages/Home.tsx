@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import type { Drivers } from '../types/drivers';
 import type { Provincia, Municipio, LocationFilters } from '../types/locations';
 import { getDrivers } from '../services/drivers.service';
@@ -168,20 +168,13 @@ const Home = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gradient-to-br from-yellow-100 via-yellow-50 to-white min-h-screen">
       <div className="mx-auto max-w-full">
         {/* Cabecera */}
-        <div className="bg-white border-b">
-          <div className="container mx-auto">
-            <h1 className="text-3xl font-bold py-4 px-2 flex items-center">
-              <Users className="mr-3 text-blue-600 h-7 w-7" />
-              Conductores Disponibles
-            </h1>
-          </div>
-        </div>
+        
 
         {/* Filtros */}
-        <div className="container mx-auto py-4">
+        <div className="container mx-auto py-6 px-4">
           <DriversFilter 
             onApplyFilters={applyFilters}
             onResetFilters={handleResetFilters}
@@ -190,10 +183,10 @@ const Home = () => {
             tiposVehiculo={tiposVehiculo}
             isLoading={loading}
           />
-                        </div>
+        </div>
 
         {/* Lista de conductores */}
-        <div className="container mx-auto py-4">
+        <div className="container mx-auto py-4 px-4">
           <DriversList 
             drivers={filteredDrivers}
             loading={loading}

@@ -86,16 +86,16 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
   };
 
   return (
-    <div className="bg-white border rounded-lg shadow-sm">
+    <div className="bg-white border rounded-xl shadow-lg border-gray-100">
       <form onSubmit={handleApplyFilters} className="grid grid-cols-1 lg:grid-cols-12 gap-3 p-4">
         {/* Buscador */}
         <div className="lg:col-span-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-yellow-500" />
             <input 
               type="text" 
               placeholder="Buscar por nombre de conductor"
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-300 bg-gray-50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isLoading}
@@ -115,7 +115,7 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
         {/* Filtro de tipo de vehículo */}
         <div className="lg:col-span-2">
           <select 
-            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-700 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-700 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             value={filters.tipo_vehiculo || ''}
             onChange={(e) => handleFilterChange('tipo_vehiculo', e.target.value)}
             disabled={isLoading}
@@ -130,7 +130,7 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
         {/* Filtro de provincia */}
         <div className="lg:col-span-2">
           <select 
-            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-700 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-700 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             value={filters.provincia_id || ''}
             onChange={(e) => handleFilterChange('provincia_id', e.target.value)}
             disabled={isLoading}
@@ -145,7 +145,7 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
         {/* Filtro de municipio */}
         <div className="lg:col-span-2">
           <select 
-            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-700 ${(!filters.provincia_id || loadingMunicipios) ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-gray-50 text-gray-700 ${(!filters.provincia_id || loadingMunicipios) ? 'opacity-70 cursor-not-allowed' : ''}`}
             value={filters.municipio_id || ''}
             onChange={(e) => handleFilterChange('municipio_id', e.target.value)}
             disabled={!filters.provincia_id || loadingMunicipios}
@@ -165,7 +165,7 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
         <div className="lg:col-span-2 grid grid-cols-2 gap-2">
           <button 
             type="submit"
-            className={`w-full px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-sm flex items-center justify-center font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md'}`}
+            className={`w-full px-3 py-2 rounded-lg bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-all duration-300 shadow-sm flex items-center justify-center font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md'}`}
             disabled={isLoading}
           >
             <Filter className="mr-2 h-4 w-4" />
@@ -173,7 +173,7 @@ const DriversFilter: React.FC<DriversFilterProps> = ({
           </button>
           <button 
             type="button"
-            className={`w-full px-3 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all duration-300 shadow-sm flex items-center justify-center font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md'}`}
+            className={`w-full px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-300 shadow-sm flex items-center justify-center font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md'}`}
             onClick={handleResetFilters}
             disabled={isLoading}
           >

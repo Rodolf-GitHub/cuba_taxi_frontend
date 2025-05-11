@@ -11,7 +11,8 @@ import {
   AlertCircle,
   CheckCircle,
   MapPin,
-  Info
+  Info,
+  Search
 } from 'lucide-react';
 import type { Drivers } from '../../types/drivers';
 
@@ -61,12 +62,8 @@ const DriversList: React.FC<DriversListProps> = ({
   // Estado de carga
   if (loading && drivers.length === 0) {
     return (
-      <div className="bg-white border rounded-lg shadow-sm p-8 text-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 rounded-full bg-blue-100 mb-4"></div>
-          <div className="h-4 w-48 bg-gray-200 rounded mb-3"></div>
-          <div className="h-3 w-32 bg-gray-100 rounded"></div>
-        </div>
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500"></div>
       </div>
     );
   }
@@ -74,19 +71,23 @@ const DriversList: React.FC<DriversListProps> = ({
   // Sin resultados
   if (drivers.length === 0) {
     return (
-      <div className="text-center py-12 bg-white shadow-sm mt-1 rounded-lg">
-        <div className="inline-flex h-16 w-16 rounded-full bg-gray-100 items-center justify-center mb-4">
-          <Car className="h-8 w-8 text-gray-400" />
+      <div className="text-center py-12">
+        <div className="inline-flex h-14 w-14 rounded-full bg-yellow-100 items-center justify-center mb-4">
+          <Search className="h-6 w-6 text-yellow-600" />
         </div>
-        <p className="text-gray-600">No hay conductores disponibles con los filtros seleccionados.</p>
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">No se encontraron conductores</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          {hasFilters ? 'Prueba con diferentes filtros' : 'No hay conductores registrados aún'}
+        </p>
         {hasFilters && (
-          <button 
-            type="button"
-            onClick={onResetFilters}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
-          >
-            Limpiar filtros
-          </button>
+          <div className="mt-6">
+            <button
+              onClick={onResetFilters}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-gray-900 bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+            >
+              Limpiar filtros
+            </button>
+          </div>
         )}
       </div>
     );
@@ -113,7 +114,7 @@ const DriversList: React.FC<DriversListProps> = ({
             {/* Vista móvil - formato tarjeta */}
             <div className="block md:hidden p-4">
               <div className="flex items-center mb-3">
-                <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center mr-3 shadow-sm">
+                <div className="h-14 w-14 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
                   {driver.profile_picture ? (
                     <img 
                       src={`${apiUrl}${driver.profile_picture}`} 
@@ -126,12 +127,12 @@ const DriversList: React.FC<DriversListProps> = ({
                       }}
                     />
                   ) : (
-                    <User className="h-7 w-7 text-blue-600" />
+                    <User className="h-7 w-7 text-yellow-600" />
                   )}
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-gray-800">{driver.username}</h3>
-                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                     {getStatusIcon(driver.disponibilidad)}
                     {driver.disponibilidad}
                   </div>
@@ -140,7 +141,7 @@ const DriversList: React.FC<DriversListProps> = ({
               
               <div className="space-y-2 mb-3">
                 <div className="flex items-center text-gray-700">
-                  <Car className="h-5 w-5 mr-2 text-blue-500" />
+                  <Car className="h-5 w-5 mr-2 text-yellow-500" />
                   <span className="font-medium">{driver.tipo_vehiculo}</span>
                   <span className="ml-2 text-sm text-gray-500">
                     ({driver.capacidad_pasajeros} pasajeros)
@@ -148,7 +149,7 @@ const DriversList: React.FC<DriversListProps> = ({
                 </div>
                 
                 <div className="flex items-center text-gray-700">
-                  <MapPin className="h-5 w-5 mr-2 text-blue-500" />
+                  <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
                   <span>{driver.municipio_nombre}, {driver.provincia_nombre}</span>
                 </div>
               </div>
@@ -157,7 +158,7 @@ const DriversList: React.FC<DriversListProps> = ({
                 {driver.telefono && (
                   <a 
                     href={`tel:${driver.telefono}`}
-                    className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-sm"
+                    className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm"
                   >
                     <Phone className="h-4 w-4 mr-2" /> 
                     Llamar
@@ -177,7 +178,7 @@ const DriversList: React.FC<DriversListProps> = ({
             <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 items-center">
               <div className="col-span-3">
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 shadow-sm">
+                  <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
                     {driver.profile_picture ? (
                       <img 
                         src={`${apiUrl}${driver.profile_picture}`} 
@@ -190,7 +191,7 @@ const DriversList: React.FC<DriversListProps> = ({
                         }}
                       />
                     ) : (
-                      <User className="h-5 w-5 text-blue-600" />
+                      <User className="h-5 w-5 text-yellow-600" />
                     )}
                   </div>
                   <span className="font-medium text-gray-800">{driver.username}</span>
@@ -199,7 +200,7 @@ const DriversList: React.FC<DriversListProps> = ({
               
               <div className="col-span-3">
                 <div className="flex items-center">
-                  <Car className="h-5 w-5 mr-2 text-blue-500" />
+                  <Car className="h-5 w-5 mr-2 text-yellow-500" />
                   <div>
                     <div className="font-medium text-gray-800">{driver.tipo_vehiculo}</div>
                     <div className="text-sm text-gray-500">{driver.capacidad_pasajeros} pasajeros</div>
@@ -209,13 +210,13 @@ const DriversList: React.FC<DriversListProps> = ({
               
               <div className="col-span-3">
                 <div className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-2 text-blue-500" />
+                  <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
                   <span className="text-gray-800">{driver.municipio_nombre}, {driver.provincia_nombre}</span>
                 </div>
               </div>
               
               <div className="col-span-2">
-                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                   {getStatusIcon(driver.disponibilidad)}
                   {driver.disponibilidad}
                 </div>
@@ -225,7 +226,7 @@ const DriversList: React.FC<DriversListProps> = ({
                 {driver.telefono && (
                   <a 
                     href={`tel:${driver.telefono}`}
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-sm hover:scale-110"
+                    className="inline-flex items-center justify-center p-2 rounded-full bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm hover:scale-110"
                     title="Llamar al conductor"
                   >
                     <Phone className="h-5 w-5" />
@@ -257,7 +258,7 @@ const DriversList: React.FC<DriversListProps> = ({
           </button>
           
           <div className="text-sm text-gray-600">
-            <Calendar className="inline-block h-4 w-4 mr-1 text-blue-500" />
+            <Calendar className="inline-block h-4 w-4 mr-1 text-yellow-500" />
             Página {currentPage + 1} de {Math.max(1, totalPages)}
           </div>
           

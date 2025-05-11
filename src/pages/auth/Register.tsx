@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, Phone, MapPin, Car, Loader2 } from 'lucide-react';
-import { register } from '../../services/auth.service';
-import { getProvincias, getMunicipiosByProvincia } from '../../services/locations.service';
+import { useNavigate } from 'react-router-dom';
+import { User, Mail, Phone, Car, MapPin, Lock } from 'lucide-react';
+import { getMunicipiosByProvincia, getProvincias } from '../../services/locations.service';
 import type { Provincia, Municipio } from '../../types/locations';
 import type { AxiosError } from 'axios';
+import { register } from '../../services/auth.service';
 
-interface RegisterFormData {
+interface FormData {
   username: string;
   email: string;
   password: string;
@@ -15,8 +15,7 @@ interface RegisterFormData {
   last_name: string;
   telefono: string;
   tipo_vehiculo: string;
-  capacidad_pasajeros: number;
-  disponibilidad: string;
+  capacidad_pasajeros: string;
   municipio_id: string;
 }
 
@@ -25,7 +24,8 @@ type VehicleType = typeof vehicleTypes[number];
 
 const Register = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<RegisterFormData>({
+  const [error, setError] = useState<string>('');
+  const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
     password: '',
@@ -34,15 +34,13 @@ const Register = () => {
     last_name: '',
     telefono: '',
     tipo_vehiculo: 'TAXI',
-    capacidad_pasajeros: 4,
-    disponibilidad: 'DISPONIBLE',
+    capacidad_pasajeros: '4',
     municipio_id: ''
   });
 
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [municipios, setMunicipios] = useState<Municipio[]>([]);
   const [selectedProvincia, setSelectedProvincia] = useState<string>('');
-  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [loadingProvincias, setLoadingProvincias] = useState(false);
   const [loadingMunicipios, setLoadingMunicipios] = useState(false);
@@ -91,32 +89,33 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
-      const dataToSend = {
+      const registerData = {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        telefono: formData.telefono,
         first_name: formData.first_name,
         last_name: formData.last_name,
+        telefono: formData.telefono,
         tipo_vehiculo: formData.tipo_vehiculo as VehicleType,
         capacidad_pasajeros: Number(formData.capacidad_pasajeros),
-        disponibilidad: formData.disponibilidad,
+        disponibilidad: 'DISPONIBLE',
         municipio_id: formData.municipio_id
       };
 
-      await register(dataToSend);
+      await register(registerData);
       navigate('/login');
     } catch (err) {
-      const error = err as AxiosError<{ detail: string }>;
-      setError(error.response?.data?.detail || 'Error al registrar usuario');
+      const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || 'Error al registrar el usuario');
     } finally {
       setLoading(false);
     }
@@ -140,28 +139,25 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-yellow-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Registro de Conductor
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-extrabold text-gray-900">
+            RutaDirecta
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            ¿Ya tienes una cuenta?{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Inicia sesión aquí
-            </Link>
+            Únete a nuestra red de transporte y mensajería
           </p>
         </div>
 
-        <div className="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white shadow-2xl rounded-xl p-8 border-t-4 border-yellow-400">
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded">
               {error}
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Información Personal */}
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Información Personal</h3>
@@ -172,14 +168,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      <User className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="text"
                       name="username"
                       id="username"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.username}
                       onChange={handleChange}
                     />
@@ -192,14 +188,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
+                      <Mail className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="email"
                       name="email"
                       id="email"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.email}
                       onChange={handleChange}
                     />
@@ -212,14 +208,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      <User className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="text"
                       name="first_name"
                       id="first_name"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.first_name}
                       onChange={handleChange}
                     />
@@ -232,14 +228,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      <User className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="text"
                       name="last_name"
                       id="last_name"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.last_name}
                       onChange={handleChange}
                     />
@@ -252,14 +248,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-gray-400" />
+                      <Phone className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="tel"
                       name="telefono"
                       id="telefono"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.telefono}
                       onChange={handleChange}
                     />
@@ -278,13 +274,13 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Car className="h-5 w-5 text-gray-400" />
+                      <Car className="h-5 w-5 text-yellow-500" />
                     </div>
                     <select
                       name="tipo_vehiculo"
                       id="tipo_vehiculo"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.tipo_vehiculo}
                       onChange={handleChange}
                     >
@@ -301,7 +297,7 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400" />
+                      <User className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="number"
@@ -309,7 +305,7 @@ const Register = () => {
                       id="capacidad_pasajeros"
                       required
                       min="1"
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.capacidad_pasajeros}
                       onChange={handleChange}
                     />
@@ -328,12 +324,12 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400" />
+                      <MapPin className="h-5 w-5 text-yellow-500" />
                     </div>
                     <select
                       id="provincia"
                       required
-                      className={`appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm ${loadingProvincias ? 'bg-gray-100' : ''}`}
+                      className={`appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm ${loadingProvincias ? 'bg-gray-100' : ''}`}
                       value={selectedProvincia}
                       onChange={handleProvinciaChange}
                       disabled={loadingProvincias}
@@ -354,13 +350,13 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400" />
+                      <MapPin className="h-5 w-5 text-yellow-500" />
                     </div>
                     <select
                       name="municipio_id"
                       id="municipio_id"
                       required
-                      className={`appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm ${loadingMunicipios ? 'bg-gray-100' : ''}`}
+                      className={`appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm ${loadingMunicipios ? 'bg-gray-100' : ''}`}
                       value={formData.municipio_id}
                       onChange={handleChange}
                       disabled={!selectedProvincia || loadingMunicipios}
@@ -387,14 +383,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="password"
                       name="password"
                       id="password"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.password}
                       onChange={handleChange}
                     />
@@ -407,14 +403,14 @@ const Register = () => {
                   </label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-yellow-500" />
                     </div>
                     <input
                       type="password"
                       name="confirmPassword"
                       id="confirmPassword"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                     />
@@ -423,22 +419,22 @@ const Register = () => {
               </div>
             </div>
 
-            <div>
+            <div className="mt-6">
               <button
                 type="submit"
-                disabled={loading || loadingProvincias || loadingMunicipios}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-gray-900 bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150 ease-in-out ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {loading ? (
                   <span className="flex items-center">
-                    <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     Registrando...
                   </span>
                 ) : (
-                  <>
-                <UserPlus className="h-5 w-5 mr-2" />
-                Registrarme
-                  </>
+                  'Registrarse'
                 )}
               </button>
             </div>

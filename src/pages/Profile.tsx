@@ -403,7 +403,7 @@ const Profile = () => {
   if (loading && !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-yellow-500" />
       </div>
     );
   }
@@ -411,7 +411,7 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow rounded-lg">
           {/* Mensajes de éxito y error */}
@@ -431,7 +431,7 @@ const Profile = () => {
             <div className="flex flex-col sm:flex-row items-center gap-6">
               {/* Foto de perfil */}
               <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-yellow-50">
                   {user.profile_picture ? (
                     <img
                       src={user.profile_picture}
@@ -440,11 +440,11 @@ const Profile = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <UserCircle className="w-16 h-16 text-gray-400" />
+                      <UserCircle className="w-16 h-16 text-yellow-300" />
                     </div>
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
+                <label className="absolute bottom-0 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer hover:bg-yellow-600 transition-colors">
                   <Camera className="w-5 h-5 text-white" />
                   <input
                     type="file"
@@ -457,7 +457,7 @@ const Profile = () => {
 
               {/* Foto del vehículo */}
               <div className="relative">
-                <div className="w-48 h-32 rounded-lg overflow-hidden bg-gray-100">
+                <div className="w-48 h-32 rounded-lg overflow-hidden bg-yellow-50">
                   {user.foto_vehiculo ? (
                     <img
                       src={user.foto_vehiculo}
@@ -466,11 +466,11 @@ const Profile = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Car className="w-16 h-16 text-gray-400" />
+                      <Car className="w-16 h-16 text-yellow-300" />
                     </div>
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
+                <label className="absolute bottom-0 right-0 bg-yellow-500 p-2 rounded-full cursor-pointer hover:bg-yellow-600 transition-colors">
                   <Camera className="w-5 h-5 text-white" />
                   <input
                     type="file"
@@ -513,7 +513,7 @@ const Profile = () => {
                       name="first_name"
                       id="first_name"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.first_name}
                       onChange={handleChange}
                     />
@@ -534,7 +534,7 @@ const Profile = () => {
                       name="last_name"
                       id="last_name"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.last_name}
                       onChange={handleChange}
                     />
@@ -555,7 +555,7 @@ const Profile = () => {
                       name="email"
                       id="email"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.email}
                       onChange={handleChange}
                     />
@@ -576,7 +576,7 @@ const Profile = () => {
                       name="telefono"
                       id="telefono"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.telefono}
                       onChange={handleChange}
                     />
@@ -601,7 +601,7 @@ const Profile = () => {
                       name="tipo_vehiculo"
                       id="tipo_vehiculo"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.tipo_vehiculo}
                       onChange={handleChange}
                     >
@@ -626,7 +626,7 @@ const Profile = () => {
                       id="capacidad_pasajeros"
                       required
                       min="1"
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.capacidad_pasajeros}
                       onChange={handleChange}
                     />
@@ -658,7 +658,7 @@ const Profile = () => {
                         name="disponibilidad"
                         id="disponibilidad"
                         required
-                        className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                        className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                         value={formData.disponibilidad}
                         onChange={handleChange}
                       >
@@ -669,8 +669,8 @@ const Profile = () => {
                     </div>
                     
                     {formData.disponibilidad === 'DISPONIBLE' && (
-                      <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
-                        <div className="flex items-center space-x-2 text-blue-700">
+                      <div className="flex items-center justify-between bg-yellow-50 p-3 rounded-lg">
+                        <div className="flex items-center space-x-2 text-yellow-700">
                           <Clock className="h-5 w-5" />
                           <span className="text-sm font-medium">
                             {timeLeft !== null ? `Tiempo restante: ${formatTimeLeft(timeLeft)}` : 'No disponible'}
@@ -680,7 +680,7 @@ const Profile = () => {
                           type="button"
                           onClick={handleUpdateDisponibilidad}
                           disabled={updatingDisponibilidad}
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
                         >
                           {updatingDisponibilidad ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -711,7 +711,7 @@ const Profile = () => {
                     <select
                       id="provincia"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={selectedProvincia}
                       onChange={handleProvinciaChange}
                       disabled={loadingProvincias}
@@ -738,7 +738,7 @@ const Profile = () => {
                       name="municipio_id"
                       id="municipio_id"
                       required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out sm:text-sm"
                       value={formData.municipio_id}
                       onChange={handleChange}
                       disabled={!selectedProvincia || loadingMunicipios}
@@ -760,7 +760,7 @@ const Profile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Guardar cambios
