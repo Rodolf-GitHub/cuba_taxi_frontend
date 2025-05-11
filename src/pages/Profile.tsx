@@ -28,6 +28,7 @@ interface User {
   provincia_id: string;
   provincia_nombre: string;
   tiempo_disponibilidad_restante: number | null;
+  dias_restantes_licencia: number;
 }
 
 const vehicleTypes: VehicleType[] = ['TAXI', 'MOTOCICLETA', 'CAMION', 'FURGONETA', 'COCHE', 'OTRO'];
@@ -632,7 +633,19 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div>
+                {/* Días restantes de licencia */}
+                <div className="sm:col-span-2">
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <Clock className="h-5 w-5 text-yellow-600 mr-2" />
+                      <span className="text-sm font-medium text-yellow-700">
+                        Días restantes de licencia: {user.dias_restantes_licencia}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
                   <label htmlFor="disponibilidad" className="block text-sm font-medium text-gray-700">
                     Disponibilidad
                   </label>

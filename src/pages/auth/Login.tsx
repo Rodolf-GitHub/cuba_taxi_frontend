@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import { LogIn, User, Lock } from 'lucide-react';
 import { login } from '../../services/auth.service';
+import { AxiosError } from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,8 +21,12 @@ const Login = () => {
     try {
       await login(formData);
       navigate('/'); // Redirigir al home después del login exitoso
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Error al iniciar sesión');
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.detail || 'Error al iniciar sesión');
+      } else {
+        setError('Error al iniciar sesión');
+      }
     } finally {
       setLoading(false);
     }
@@ -40,12 +45,7 @@ const Login = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Iniciar Sesión
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            Regístrate aquí
-          </Link>
-        </p>
+        
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
