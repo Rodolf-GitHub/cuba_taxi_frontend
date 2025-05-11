@@ -4,6 +4,7 @@ import { User as UserIcon, Camera, Loader2, MapPin, Car, Phone, UserCircle, Mail
 import axios from 'axios';
 import { getProvincias, getMunicipiosByProvincia } from '../services/locations.service';
 import type { Provincia, Municipio } from '../types/locations';
+import ChangePasswordModal from '../components/profile/ChangePasswordModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -57,6 +58,7 @@ const Profile = () => {
   });
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [updatingDisponibilidad, setUpdatingDisponibilidad] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   // Función para construir la URL completa de las imágenes
   const getFullImageUrl = (imageUrl: string | null) => {
@@ -484,18 +486,25 @@ const Profile = () => {
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
             {/* Información Personal */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">Información Personal</h3>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-6">Información Personal</h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {/* Username (no editable) */}
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700">
                     Nombre de usuario
                   </label>
-                  <div className="mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50">
-                    {user?.username}
+                  <div className="mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50 flex justify-between items-center">
+                    <span>{user?.username}</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsChangePasswordModalOpen(true)}
+                      className="text-sm text-yellow-600 hover:text-yellow-700 font-medium"
+                    >
+                      Cambiar contraseña
+                    </button>
                   </div>
                 </div>
 
@@ -586,8 +595,8 @@ const Profile = () => {
             </div>
 
             {/* Información del Vehículo */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">Información del Vehículo</h3>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-6">Información del Vehículo</h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label htmlFor="tipo_vehiculo" className="block text-sm font-medium text-gray-700">
@@ -645,6 +654,7 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Disponibilidad */}
                 <div className="sm:col-span-2">
                   <label htmlFor="disponibilidad" className="block text-sm font-medium text-gray-700">
                     Disponibilidad
@@ -697,8 +707,8 @@ const Profile = () => {
             </div>
 
             {/* Ubicación */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">Ubicación</h3>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-6">Ubicación</h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label htmlFor="provincia" className="block text-sm font-medium text-gray-700">
@@ -756,7 +766,7 @@ const Profile = () => {
             </div>
 
             {/* Botón de guardar */}
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-6 border-t">
               <button
                 type="submit"
                 disabled={loading}
@@ -768,6 +778,12 @@ const Profile = () => {
             </div>
           </form>
         </div>
+
+        {/* Modal de cambio de contraseña */}
+        <ChangePasswordModal
+          isOpen={isChangePasswordModalOpen}
+          onClose={() => setIsChangePasswordModalOpen(false)}
+        />
       </div>
     </div>
   );

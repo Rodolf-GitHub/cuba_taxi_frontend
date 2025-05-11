@@ -40,10 +40,45 @@ const DriversList: React.FC<DriversListProps> = ({
   hasFilters
 }) => {
   const navigate = useNavigate();
+
+  // Ordenar conductores por disponibilidad
+  const sortedDrivers = [...drivers].sort((a, b) => {
+    const order: Record<string, number> = {
+      'DISPONIBLE': 0,
+      'OCUPADO': 1,
+      'NO_DISPONIBLE': 2
+    };
+    return (order[a.disponibilidad] ?? 2) - (order[b.disponibilidad] ?? 2);
+  });
+
   // Calcular conductores visibles en la página actual
   const driversPerPage = 10;
   const startIndex = currentPage * driversPerPage;
-  const visibleDrivers = drivers.slice(startIndex, startIndex + driversPerPage);
+  const visibleDrivers = sortedDrivers.slice(startIndex, startIndex + driversPerPage);
+
+  // Función para obtener las clases de estilo según el estado
+  const getStatusClasses = (status: string) => {
+    switch(status.toLowerCase()) {
+      case 'disponible':
+        return {
+          container: 'bg-green-50 ring-1 ring-green-100',
+          badge: 'bg-green-100 text-green-800',
+          icon: 'text-green-500'
+        };
+      case 'ocupado':
+        return {
+          container: 'bg-yellow-50 ring-1 ring-yellow-100',
+          badge: 'bg-yellow-100 text-yellow-800',
+          icon: 'text-yellow-500'
+        };
+      default:
+        return {
+          container: 'bg-red-50 ring-1 ring-red-100',
+          badge: 'bg-red-100 text-red-800',
+          icon: 'text-red-500'
+        };
+    }
+  };
 
   // Función para mostrar el icono según el estado del conductor
   const getStatusIcon = (status: string) => {
@@ -52,10 +87,8 @@ const DriversList: React.FC<DriversListProps> = ({
         return <CheckCircle className="h-4 w-4 mr-1" />;
       case 'ocupado':
         return <Clock className="h-4 w-4 mr-1" />;
-      case 'inactivo':
-        return <AlertCircle className="h-4 w-4 mr-1" />;
       default:
-        return <Clock className="h-4 w-4 mr-1" />;
+        return <AlertCircle className="h-4 w-4 mr-1" />;
     }
   };
 
@@ -106,84 +139,22 @@ const DriversList: React.FC<DriversListProps> = ({
 
       {/* Lista de conductores */}
       <div className="divide-y">
-        {visibleDrivers.map((driver) => (
-          <div 
-            key={driver.id} 
-            className="hover:bg-gray-50 transition-all duration-200"
-          >
-            {/* Vista móvil - formato tarjeta */}
-            <div className="block md:hidden p-4">
-              <div className="flex items-center mb-3">
-                <div className="h-14 w-14 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
-                  {driver.profile_picture ? (
-                    <img 
-                      src={`${apiUrl}${driver.profile_picture}`} 
-                      alt={driver.username}
-                      className="h-14 w-14 rounded-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = "https://via.placeholder.com/100?text=Usuario";
-                      }}
-                    />
-                  ) : (
-                    <User className="h-7 w-7 text-yellow-600" />
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800">{driver.username}</h3>
-                  <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    {getStatusIcon(driver.disponibilidad)}
-                    {driver.disponibilidad}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-2 mb-3">
-                <div className="flex items-center text-gray-700">
-                  <Car className="h-5 w-5 mr-2 text-yellow-500" />
-                  <span className="font-medium">{driver.tipo_vehiculo}</span>
-                  <span className="ml-2 text-sm text-gray-500">
-                    ({driver.capacidad_pasajeros} pasajeros)
-                  </span>
-                </div>
-                
-                <div className="flex items-center text-gray-700">
-                  <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
-                  <span>{driver.municipio_nombre}, {driver.provincia_nombre}</span>
-                </div>
-              </div>
-              
-              <div className="flex space-x-2 mt-3">
-                {driver.telefono && (
-                  <a 
-                    href={`tel:${driver.telefono}`}
-                    className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm"
-                  >
-                    <Phone className="h-4 w-4 mr-2" /> 
-                    Llamar
-                  </a>
-                )}
-                <button
-                  onClick={() => navigate(`/driver/${driver.id}`)}
-                  className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition-all duration-300 shadow-sm"
-                >
-                  <Info className="h-4 w-4 mr-2" />
-                  Ver detalles
-                </button>
-              </div>
-            </div>
-            
-            {/* Vista desktop - formato de fila */}
-            <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 items-center">
-              <div className="col-span-3">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
+        {visibleDrivers.map((driver) => {
+          const statusClasses = getStatusClasses(driver.disponibilidad);
+          return (
+            <div 
+              key={driver.id} 
+              className={`transition-all duration-200 ${statusClasses.container}`}
+            >
+              {/* Vista móvil - formato tarjeta */}
+              <div className="block md:hidden p-4">
+                <div className="flex items-center mb-3">
+                  <div className="h-14 w-14 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
                     {driver.profile_picture ? (
                       <img 
                         src={`${apiUrl}${driver.profile_picture}`} 
                         alt={driver.username}
-                        className="h-10 w-10 rounded-full object-cover"
+                        className="h-14 w-14 rounded-full object-cover"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.onerror = null;
@@ -191,58 +162,123 @@ const DriversList: React.FC<DriversListProps> = ({
                         }}
                       />
                     ) : (
-                      <User className="h-5 w-5 text-yellow-600" />
+                      <User className="h-7 w-7 text-yellow-600" />
                     )}
                   </div>
-                  <span className="font-medium text-gray-800">{driver.username}</span>
-                </div>
-              </div>
-              
-              <div className="col-span-3">
-                <div className="flex items-center">
-                  <Car className="h-5 w-5 mr-2 text-yellow-500" />
                   <div>
-                    <div className="font-medium text-gray-800">{driver.tipo_vehiculo}</div>
-                    <div className="text-sm text-gray-500">{driver.capacidad_pasajeros} pasajeros</div>
+                    <h3 className="font-bold text-lg text-gray-800">{driver.username}</h3>
+                    <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses.badge}`}>
+                      <span className={statusClasses.icon}>{getStatusIcon(driver.disponibilidad)}</span>
+                      {driver.disponibilidad}
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="col-span-3">
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
-                  <span className="text-gray-800">{driver.municipio_nombre}, {driver.provincia_nombre}</span>
+                
+                <div className="space-y-2 mb-3">
+                  <div className="flex items-center text-gray-700">
+                    <Car className="h-5 w-5 mr-2 text-yellow-500" />
+                    <span className="font-medium">{driver.tipo_vehiculo}</span>
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({driver.capacidad_pasajeros} pasajeros)
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center text-gray-700">
+                    <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
+                    <span>{driver.municipio_nombre}, {driver.provincia_nombre}</span>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="col-span-2">
-                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                  {getStatusIcon(driver.disponibilidad)}
-                  {driver.disponibilidad}
-                </div>
-              </div>
-              
-              <div className="col-span-1 flex justify-center space-x-2">
-                {driver.telefono && (
-                  <a 
-                    href={`tel:${driver.telefono}`}
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm hover:scale-110"
-                    title="Llamar al conductor"
+                
+                <div className="flex space-x-2 mt-3">
+                  {driver.telefono && (
+                    <a 
+                      href={`tel:${driver.telefono}`}
+                      className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm"
+                    >
+                      <Phone className="h-4 w-4 mr-2" /> 
+                      Llamar
+                    </a>
+                  )}
+                  <button
+                    onClick={() => navigate(`/driver/${driver.id}`)}
+                    className="flex-1 flex items-center justify-center px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition-all duration-300 shadow-sm"
                   >
-                    <Phone className="h-5 w-5" />
-                  </a>
-                )}
-                <button
-                  onClick={() => navigate(`/driver/${driver.id}`)}
-                  className="inline-flex items-center justify-center p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-all duration-300 shadow-sm hover:scale-110"
-                  title="Ver detalles"
-                >
-                  <Info className="h-5 w-5" />
-                </button>
+                    <Info className="h-4 w-4 mr-2" />
+                    Ver detalles
+                  </button>
+                </div>
+              </div>
+              
+              {/* Vista desktop - formato de fila */}
+              <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 items-center">
+                <div className="col-span-3">
+                  <div className="flex items-center">
+                    <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shadow-sm">
+                      {driver.profile_picture ? (
+                        <img 
+                          src={`${apiUrl}${driver.profile_picture}`} 
+                          alt={driver.username}
+                          className="h-10 w-10 rounded-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = "https://via.placeholder.com/100?text=Usuario";
+                          }}
+                        />
+                      ) : (
+                        <User className="h-5 w-5 text-yellow-600" />
+                      )}
+                    </div>
+                    <span className="font-medium text-gray-800">{driver.username}</span>
+                  </div>
+                </div>
+                
+                <div className="col-span-3">
+                  <div className="flex items-center">
+                    <Car className="h-5 w-5 mr-2 text-yellow-500" />
+                    <div>
+                      <div className="font-medium text-gray-800">{driver.tipo_vehiculo}</div>
+                      <div className="text-sm text-gray-500">{driver.capacidad_pasajeros} pasajeros</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="col-span-3">
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 mr-2 text-yellow-500" />
+                    <span className="text-gray-800">{driver.municipio_nombre}, {driver.provincia_nombre}</span>
+                  </div>
+                </div>
+                
+                <div className="col-span-2">
+                  <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClasses.badge}`}>
+                    <span className={statusClasses.icon}>{getStatusIcon(driver.disponibilidad)}</span>
+                    {driver.disponibilidad}
+                  </div>
+                </div>
+                
+                <div className="col-span-1 flex justify-center space-x-2">
+                  {driver.telefono && (
+                    <a 
+                      href={`tel:${driver.telefono}`}
+                      className="inline-flex items-center justify-center p-2 rounded-full bg-yellow-600 text-white hover:bg-yellow-700 transition-all duration-300 shadow-sm hover:scale-110"
+                      title="Llamar al conductor"
+                    >
+                      <Phone className="h-5 w-5" />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => navigate(`/driver/${driver.id}`)}
+                    className="inline-flex items-center justify-center p-2 rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-all duration-300 shadow-sm hover:scale-110"
+                    title="Ver detalles"
+                  >
+                    <Info className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Paginación */}
