@@ -14,7 +14,7 @@ const Header = () => {
           <Link to="/" className="flex items-center gap-2 text-2xl font-bold">
             <Car className="w-8 h-8 text-blue-600" />
             <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-              CubaTaxi
+              RutaDirecta
             </span>
           </Link>
 

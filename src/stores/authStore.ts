@@ -1,6 +1,8 @@
 // src/stores/authStore.ts
-import axios from 'axios';
+import api from '../services/axios.config';
 import { useState, useEffect } from 'react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://api-ruta-directa.e-comcuba.com';
 
 export type VehicleType = 'TAXI' | 'MOTOCICLETA' | 'CAMION' | 'FURGONETA' | 'COCHE' | 'OTRO';
 export type DisponibilidadType = 'DISPONIBLE' | 'NO_DISPONIBLE' | 'OCUPADO';
@@ -49,7 +51,7 @@ class AuthStore {
     if (savedUser) this._user = JSON.parse(savedUser);
     if (savedToken) {
       this._token = savedToken;
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
     }
   }
 
@@ -89,10 +91,10 @@ class AuthStore {
     this._token = token;
     if (token) {
       localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
       localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
+      delete api.defaults.headers.common['Authorization'];
     }
     this.notify();
   }
@@ -109,14 +111,21 @@ class AuthStore {
   }
 
   async getProfile(): Promise<User> {
-    const response = await axios.get('/api/users/me');
-    const userData = response.data;
-    this.setUser(userData);
-    return userData;
+    try {
+      console.log('Obteniendo perfil desde:', `${API_URL}/api/users/me`);
+      const response = await api.get(`${API_URL}/api/users/me`);
+      const userData = response.data;
+      this.setUser(userData);
+      return userData;
+    } catch (error) {
+      console.error('Error al obtener perfil:', error);
+      
+      throw error;
+    }
   }
 
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    const response = await axios.put('/api/users/me', data);
+    const response = await api.put(`${API_URL}/api/users/me`, data);
     const userData = response.data;
     this.setUser(userData);
     return userData;
@@ -126,7 +135,7 @@ class AuthStore {
     const formData = new FormData();
     formData.append('profile_picture', file);
 
-    const response = await axios.put('/api/users/me/profile-picture', formData, {
+    const response = await api.put(`${API_URL}/api/users/me/profile-picture`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -140,7 +149,7 @@ class AuthStore {
     const formData = new FormData();
     formData.append('foto_vehiculo', file);
 
-    const response = await axios.put('/api/users/me/vehicle-picture', formData, {
+    const response = await api.put(`${API_URL}/api/users/me/vehicle-picture`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

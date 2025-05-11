@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { authStore } from '../stores/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api-ruta-directa.e-comcuba.com';
 
 interface LoginResponse {
   access_token: string;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Drivers, DriverDetails } from '../types/drivers';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api-ruta-directa.e-comcuba.com';
 
 export const getDrivers = async (): Promise<Drivers[]> => {
   try {

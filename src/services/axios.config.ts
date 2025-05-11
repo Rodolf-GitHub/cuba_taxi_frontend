@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosResponse, AxiosError } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api-ruta-directa.e-comcuba.com';
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
